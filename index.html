@@ -3,7 +3,7 @@
 <head>
     <meta charSet="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <title>投資回測系統 v0.8.12 - 台股投資策略回測</title>
+    <title>投資回測系統 v0.8.13 - 台股投資策略回測</title>
     <meta name="description" content="你的投資策略 AI 幫手 — 一次比較 Buy & Hold、定期定額、技術策略三種投資方法"/>
     
     <!-- Tailwind CSS -->
@@ -197,6 +197,10 @@
                         賺錢的交易筆數 ÷ 總平倉次數。高勝率通常讓人安心，但有些「趨勢跟蹤」策略勝率可能只有40%，卻能靠「大賺小賠」達到高總報酬。
                     </li>
                     <li>
+                        <strong class="text-brand-primary">平倉次數 (Trades)：</strong><br>
+                        策略在回測期間內完整執行「買進並賣出」的總次數。次數過少代表運氣成分可能較高（樣本數不足，缺乏統計意義）；次數過多則會累積龐大的交易成本。
+                    </li>
+                    <li>
                         <strong class="text-brand-primary">最大回撤 (MDD)：</strong><br>
                         衡量運氣最差「買在最高、賣在最低」會虧多少。例如 -30%，代表您最多會面臨 30% 帳面虧損。數字越小越好。
                     </li>
@@ -270,7 +274,7 @@
                 <div>
                     <div class="flex items-center gap-2">
                         <h1 class="text-xl font-bold m-0 text-gray-900 dark:text-white">投資回測系統</h1>
-                        <span class="text-[10px] font-semibold text-brand-primary bg-brand-primary/15 px-2 py-0.5 rounded-full border border-brand-primary/30">v0.8.12</span>
+                        <span class="text-[10px] font-semibold text-brand-primary bg-brand-primary/15 px-2 py-0.5 rounded-full border border-brand-primary/30">v0.8.13</span>
                     </div>
                     <p class="text-xs text-gray-500 dark:text-brand-muted m-0">你的投資策略 AI 幫手</p>
                 </div>
@@ -679,7 +683,7 @@
 
     <!-- Footer -->
     <footer class="border-t border-gray-200 dark:border-brand-border py-6 text-center mt-auto">
-        <p class="text-xs text-gray-500 dark:text-brand-muted m-0">v0.8.12 | ©2026 <a href="https://huobest.com/" target="_blank" class="text-brand-primary hover:text-brand-secondary transition-colors font-medium">霍家私塾</a></p>
+        <p class="text-xs text-gray-500 dark:text-brand-muted m-0">v0.8.13 | ©2026 <a href="https://huobest.com/" target="_blank" class="text-brand-primary hover:text-brand-secondary transition-colors font-medium">霍家私塾</a></p>
     </footer>
 
     <!-- JS Logic -->
