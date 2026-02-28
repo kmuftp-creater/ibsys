@@ -3,7 +3,7 @@
 <head>
     <meta charSet="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <title>投資回測系統 v0.8.9 - 台股投資策略回測</title>
+    <title>投資回測系統 v0.8.12 - 台股投資策略回測</title>
     <meta name="description" content="你的投資策略 AI 幫手 — 一次比較 Buy & Hold、定期定額、技術策略三種投資方法"/>
     
     <!-- Tailwind CSS -->
@@ -32,8 +32,6 @@
     </script>
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- HTML2PDF -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     
     <style>
         ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -98,69 +96,15 @@
         html:not(.dark) .markdown-content th, html:not(.dark) .markdown-content td { border: 1px solid #e5e7eb; }
         .markdown-content th { background-color: #161922; font-weight: bold; }
         html:not(.dark) .markdown-content th { background-color: #f9fafb; }
-        
-        /* PDF Export Fixes */
-        body.pdf-mode {
-            overflow: visible !important;
-            width: 1500px !important;
-            min-width: 1500px !important;
-            height: auto !important;
-            margin: 0 !important;
-            padding: 0 !important;
-        }
-        .pdf-exporting { 
-            width: 1500px !important; 
-            max-width: 1500px !important; 
-            min-width: 1500px !important; 
-            height: auto !important; 
-            overflow: visible !important; 
-            margin: 0 !important; /* 取消置中，避免左側截斷 */
-            padding: 24px !important;
-        }
-        .pdf-exporting > div.grid {
-            grid-template-columns: 320px 1fr 360px !important;
-            display: grid !important;
-            gap: 24px !important;
-            align-items: start !important; /* 防止左右欄位互相拉伸導致截斷 */
-        }
-        
-        /* 強制解除左、中、右三大欄位的所有高度限制與固定定位，使其完全向下攤平 */
-        .pdf-exporting > div.grid > div {
-            max-height: none !important;
-            height: auto !important;
-            overflow: visible !important;
-            position: static !important; 
-        }
-
-        /* 內部明細表格與所有捲軸區塊全面解開 */
-        .pdf-exporting .overflow-y-auto, 
-        .pdf-exporting .overflow-x-auto, 
-        .pdf-exporting .max-h-64, 
-        .pdf-exporting .max-h-48, 
-        .pdf-exporting .custom-scrollbar {
-            max-height: none !important;
-            height: auto !important;
-            overflow: visible !important;
-        }
-
-        @media print {
-            body { background: white !important; color: black !important; }
-            .no-print { display: none !important; }
-            .print-full { width: 100% !important; max-width: 100% !important; grid-template-columns: 1fr !important; }
-            .metric-card { background: white !important; border: 1px solid #ccc !important; break-inside: avoid; box-shadow: none; }
-            .metric-value-box { background: white !important; border: 1px solid #eee !important; }
-            canvas { max-width: 100% !important; }
-            * { color: black !important; border-color: #ccc !important; }
-        }
     </style>
 </head>
 <body class="bg-gray-100 text-gray-900 dark:bg-brand-dark dark:text-brand-text min-h-screen font-sans antialiased relative transition-colors flex flex-col">
 
     <!-- Toast Notifications -->
-    <div id="toastContainer" class="fixed bottom-6 right-6 z-[100] flex flex-col gap-3 pointer-events-none no-print"></div>
+    <div id="toastContainer" class="fixed bottom-6 right-6 z-[100] flex flex-col gap-3 pointer-events-none"></div>
 
     <!-- Instruction Modal -->
-    <div id="instructionModal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/50 backdrop-blur-sm transition-opacity opacity-0 no-print">
+    <div id="instructionModal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/50 backdrop-blur-sm transition-opacity opacity-0">
         <div class="bg-white dark:bg-brand-panel p-6 rounded-xl shadow-2xl max-w-3xl w-full mx-4 border border-gray-200 dark:border-brand-border transform scale-95 transition-transform duration-300 max-h-[85vh] flex flex-col">
             <div class="flex justify-between items-center mb-4 border-b border-gray-200 dark:border-[#2a2e39] pb-3">
                 <h3 class="text-xl font-bold text-brand-primary flex items-center gap-2">📖 使用說明書 (新手實戰指南)</h3>
@@ -249,6 +193,10 @@
                 <h2>📊 4. 績效與財務數據怎麼看？</h2>
                 <ul class="space-y-3 mt-2">
                     <li>
+                        <strong class="text-brand-primary">勝率 (Win Rate)：</strong><br>
+                        賺錢的交易筆數 ÷ 總平倉次數。高勝率通常讓人安心，但有些「趨勢跟蹤」策略勝率可能只有40%，卻能靠「大賺小賠」達到高總報酬。
+                    </li>
+                    <li>
                         <strong class="text-brand-primary">最大回撤 (MDD)：</strong><br>
                         衡量運氣最差「買在最高、賣在最低」會虧多少。例如 -30%，代表您最多會面臨 30% 帳面虧損。數字越小越好。
                     </li>
@@ -315,26 +263,23 @@
     </div>
 
     <!-- Header -->
-    <header class="sticky top-0 z-50 bg-white/90 dark:bg-brand-panel/90 border-b border-gray-200 dark:border-brand-border px-6 py-3 backdrop-blur-md transition-colors no-print">
+    <header class="sticky top-0 z-50 bg-white/90 dark:bg-brand-panel/90 border-b border-gray-200 dark:border-brand-border px-6 py-3 backdrop-blur-md transition-colors">
         <div class="max-w-[1600px] mx-auto flex items-center justify-between">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-primary to-brand-secondary flex items-center justify-center text-white font-bold text-xl shadow-lg">H</div>
                 <div>
                     <div class="flex items-center gap-2">
                         <h1 class="text-xl font-bold m-0 text-gray-900 dark:text-white">投資回測系統</h1>
-                        <span class="text-[10px] font-semibold text-brand-primary bg-brand-primary/15 px-2 py-0.5 rounded-full border border-brand-primary/30">v0.8.10</span>
+                        <span class="text-[10px] font-semibold text-brand-primary bg-brand-primary/15 px-2 py-0.5 rounded-full border border-brand-primary/30">v0.8.12</span>
                     </div>
                     <p class="text-xs text-gray-500 dark:text-brand-muted m-0">你的投資策略 AI 幫手</p>
                 </div>
             </div>
             <div class="flex items-center gap-2">
-                <button id="exportPdfBtn" onclick="exportPDF()" class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border border-gray-300 dark:border-brand-border bg-gray-50 dark:bg-[#161922] text-gray-700 dark:text-brand-text text-sm font-medium hover:bg-gray-100 dark:hover:bg-[#2a2e39] dark:hover:text-white transition-colors">
-                    📄 匯出 PDF
-                </button>
-                <button onclick="openModal()" class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border border-gray-300 dark:border-brand-border bg-gray-50 dark:bg-[#161922] text-gray-700 dark:text-brand-text text-sm font-medium hover:bg-gray-100 dark:hover:bg-[#2a2e39] dark:hover:text-white transition-colors">
+                <button onclick="openModal()" class="flex items-center justify-center gap-1.5 h-9 px-4 rounded-lg border border-gray-300 dark:border-brand-border bg-gray-50 dark:bg-[#161922] text-gray-700 dark:text-brand-text text-sm font-medium hover:bg-gray-100 dark:hover:bg-[#2a2e39] dark:hover:text-white transition-colors">
                     📖 說明
                 </button>
-                <button id="themeToggle" class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border border-gray-300 dark:border-brand-border bg-gray-50 dark:bg-[#161922] text-gray-700 dark:text-brand-text text-sm font-medium hover:bg-gray-100 dark:hover:bg-[#2a2e39] dark:hover:text-white transition-colors" title="切換主題">
+                <button id="themeToggle" class="flex items-center justify-center gap-1.5 h-9 px-4 rounded-lg border border-gray-300 dark:border-brand-border bg-gray-50 dark:bg-[#161922] text-gray-700 dark:text-brand-text text-sm font-medium hover:bg-gray-100 dark:hover:bg-[#2a2e39] dark:hover:text-white transition-colors" title="切換主題">
                     ☀️ 亮色
                 </button>
             </div>
@@ -342,11 +287,11 @@
     </header>
 
     <!-- Main Content Grid -->
-    <main id="mainContentArea" class="flex-grow max-w-[1600px] w-full mx-auto p-4 md:p-6 print-full transition-colors">
-        <div class="grid grid-cols-1 lg:grid-cols-[320px_1fr_360px] gap-6 print-full">
+    <main id="mainContentArea" class="flex-grow max-w-[1600px] w-full mx-auto p-4 md:p-6 transition-colors">
+        <div class="grid grid-cols-1 lg:grid-cols-[320px_1fr_360px] gap-6">
             
             <!-- Left Column: Controls -->
-            <div class="flex flex-col gap-4 lg:sticky lg:top-[88px] h-fit max-h-[calc(100vh-100px)] overflow-y-auto pr-2 pb-10 no-print">
+            <div class="flex flex-col gap-4 lg:sticky lg:top-[88px] h-fit max-h-[calc(100vh-100px)] overflow-y-auto custom-scrollbar pr-2 pb-10">
                 
                 <!-- 個人書籤 -->
                 <div class="bg-white dark:bg-brand-panel rounded-xl border border-gray-200 dark:border-brand-border p-4 shadow-sm">
@@ -647,7 +592,7 @@
             </div>
 
             <!-- Middle Column: Charts & Details -->
-            <div class="flex flex-col gap-5 min-w-0 print-full">
+            <div class="flex flex-col gap-5 min-w-0">
                 
                 <!-- Equity Chart -->
                 <div class="bg-white dark:bg-brand-panel rounded-xl border border-gray-200 dark:border-brand-border p-5 shadow-sm flex flex-col h-[400px]">
@@ -715,7 +660,7 @@
             </div>
 
             <!-- Right Column: Performance Metrics -->
-            <div class="flex flex-col gap-4 lg:sticky lg:top-[88px] h-fit no-print">
+            <div class="flex flex-col gap-4 lg:sticky lg:top-[88px] h-fit">
                 
                 <!-- Strategy Selector Tabs for Right Panel -->
                 <div class="flex rounded-xl overflow-hidden border border-gray-200 dark:border-[#2a2e39] bg-gray-100 dark:bg-[#161922] p-1 gap-1">
@@ -733,8 +678,8 @@
     </main>
 
     <!-- Footer -->
-    <footer class="border-t border-gray-200 dark:border-brand-border py-6 text-center mt-auto no-print">
-        <p class="text-xs text-gray-500 dark:text-brand-muted m-0">v0.8.10 | ©2026 <a href="https://huobest.com/" target="_blank" class="text-brand-primary hover:text-brand-secondary transition-colors font-medium">霍家私塾</a></p>
+    <footer class="border-t border-gray-200 dark:border-brand-border py-6 text-center mt-auto">
+        <p class="text-xs text-gray-500 dark:text-brand-muted m-0">v0.8.12 | ©2026 <a href="https://huobest.com/" target="_blank" class="text-brand-primary hover:text-brand-secondary transition-colors font-medium">霍家私塾</a></p>
     </footer>
 
     <!-- JS Logic -->
@@ -982,59 +927,6 @@
                 } catch(err) { showToast('JSON 格式錯誤', 'error'); }
             };
             reader.readAsText(file);
-        }
-
-        function exportPDF() { 
-            const btn = document.getElementById('exportPdfBtn');
-            const origText = btn.innerHTML;
-            btn.innerHTML = '⏳ 匯出中...';
-            btn.disabled = true;
-
-            // 修正 html2canvas 擷取截斷 Bug：強制滾動回頂部
-            const origScrollPos = window.scrollY;
-            window.scrollTo(0, 0);
-
-            // 加入 PDF 模式樣式
-            document.body.classList.add('pdf-mode');
-            const element = document.getElementById('mainContentArea');
-            element.classList.add('pdf-exporting'); 
-            
-            // 給予 DOM 一點時間重新展開與計算高度
-            setTimeout(() => {
-                const opt = {
-                    margin:       10, // 上, 左, 下, 右
-                    filename:     '投資回測報告_v0.8.10.pdf',
-                    image:        { type: 'jpeg', quality: 0.98 },
-                    html2canvas:  { 
-                        scale: 2, 
-                        useCORS: true, 
-                        windowWidth: 1500, // 配合 CSS 鎖定的寬度
-                        width: 1500,       // 強制畫布抓取 1500px 避免右側黑邊
-                        x: 0,              // 從最左側開始抓
-                        scrollY: 0,
-                        scrollX: 0,
-                        backgroundColor: document.documentElement.classList.contains('dark') ? '#161922' : '#F5F7FA' 
-                    },
-                    jsPDF:        { unit: 'mm', format: 'a3', orientation: 'landscape' },
-                    pagebreak:    { mode: 'avoid-all' } // 盡量保持區塊不被切斷
-                };
-
-                html2pdf().set(opt).from(element).save().then(() => {
-                    element.classList.remove('pdf-exporting');
-                    document.body.classList.remove('pdf-mode');
-                    btn.innerHTML = origText;
-                    btn.disabled = false;
-                    window.scrollTo(0, origScrollPos); // 恢復原本捲動位置
-                    showToast('PDF 下載成功', 'success');
-                }).catch(err => {
-                    element.classList.remove('pdf-exporting');
-                    document.body.classList.remove('pdf-mode');
-                    btn.innerHTML = origText;
-                    btn.disabled = false;
-                    window.scrollTo(0, origScrollPos);
-                    showToast('匯出失敗，請再試一次', 'error');
-                });
-            }, 500);
         }
 
         // --- Data Fetching (Yahoo + FinMind) ---
@@ -1291,9 +1183,9 @@
                 const eqBH=[], eqDCA=[], eqTech=[], eqTwii=[];
                 globalTrades = { bh: [], dca: [], tech: [] };
                 
-                let trBH = { shares:0, cost:initCap, fees:0, tax:0, div:0, divCount:0, gp:0, gl:0, trades:0 };
-                let trDCA= { shares:0, cash:0, invested:initCap, fees:0, tax:0, div:0, dcaCount:0, gp:0, gl:0, trades:0 }; 
-                let trTec= { shares:0, cash:initCap, cost:0, fees:0, tax:0, div:0, trades:0, gp:0, gl:0 };
+                let trBH = { shares:0, cost:initCap, fees:0, tax:0, div:0, divCount:0, gp:0, gl:0, trades:0, winTrades:0, lossTrades:0 };
+                let trDCA= { shares:0, cash:0, invested:initCap, fees:0, tax:0, div:0, dcaCount:0, gp:0, gl:0, trades:0, winTrades:0, lossTrades:0 }; 
+                let trTec= { shares:0, cash:initCap, cost:0, fees:0, tax:0, div:0, trades:0, gp:0, gl:0, winTrades:0, lossTrades:0 };
 
                 const dcaAmt = parseFloat(document.getElementById('dcaAmount').value.replace(/,/g, ''))||0;
                 const dcaLimit = parseInt(document.getElementById('dcaPeriods').value)||9999;
@@ -1409,8 +1301,8 @@
                         let netVal = gross - fee - tax;
                         
                         let pnl = netVal - trTec.cost;
-                        if (pnl > 0) trTec.gp += pnl;
-                        else trTec.gl += Math.abs(pnl);
+                        if (pnl > 0) { trTec.gp += pnl; trTec.winTrades++; }
+                        else { trTec.gl += Math.abs(pnl); trTec.lossTrades++; }
 
                         trTec.cash = netVal; trTec.fees += fee; trTec.tax += tax;
                         if(!overrideParams) globalTrades.tech.push({ date: dt, act: actName, px: pSell, sh: trTec.shares, amt: gross, fee: fee, tax: tax });
@@ -1468,7 +1360,7 @@
                     let totpnl = actualVal - invested;
                     let repnl = totpnl - unpnl;
                     
-                    return { final: finalEq, ret, annRet, mdd: maxDD, sharpe, pf, sh: tr.shares, val: curVal, cost: tr.cost || invested, unpnl, repnl, totpnl, fee: tr.fees, tax: tr.tax, div: tr.div, divCnt: tr.divCount||0, trades: tr.trades||0 };
+                    return { final: finalEq, ret, annRet, mdd: maxDD, sharpe, pf, sh: tr.shares, val: curVal, cost: tr.cost || invested, unpnl, repnl, totpnl, fee: tr.fees, tax: tr.tax, div: tr.div, divCnt: tr.divCount||0, trades: tr.trades||0, winTrades: tr.winTrades||0, lossTrades: tr.lossTrades||0 };
                 };
 
                 let endTechVal = trTec.shares > 0 ? (trTec.shares * globalPrices[globalPrices.length-1] + trTec.cash) : trTec.cash;
@@ -1557,6 +1449,14 @@
                 if (currentMetricTab === 'bh' || currentMetricTab === 'dca') pfText = '<span class="text-[10px] font-normal text-gray-500 dark:text-brand-muted">不適用(無平倉)</span>';
                 else pfText = '<span class="text-[10px] font-normal text-gray-500 dark:text-brand-muted">期間無平倉</span>';
             }
+
+            let winRateText = 'N/A';
+            if (m.trades > 0) {
+                winRateText = ((m.winTrades / m.trades) * 100).toFixed(1) + '%';
+            } else {
+                if (currentMetricTab === 'bh' || currentMetricTab === 'dca') winRateText = '<span class="text-[10px] font-normal text-gray-500 dark:text-brand-muted">不適用</span>';
+                else winRateText = '<span class="text-[10px] font-normal text-gray-500 dark:text-brand-muted">無平倉紀錄</span>';
+            }
             
             // 動態標籤：讓使用者明白 Strategy 的成本是指目前開倉的成本
             let costLabel = '總投入成本';
@@ -1586,6 +1486,14 @@
                         <div class="metric-value-box flex flex-col justify-center items-center py-3">
                             <span class="text-[10px] text-gray-500 dark:text-brand-muted mb-1">獲利因子 (PF)</span>
                             <span class="text-sm font-bold text-gray-900 dark:text-brand-text font-mono">${pfText}</span>
+                        </div>
+                        <div class="metric-value-box flex flex-col justify-center items-center py-3">
+                            <span class="text-[10px] text-gray-500 dark:text-brand-muted mb-1">勝率 (Win Rate)</span>
+                            <span class="text-sm font-bold text-gray-900 dark:text-brand-text font-mono">${winRateText}</span>
+                        </div>
+                        <div class="metric-value-box flex flex-col justify-center items-center py-3">
+                            <span class="text-[10px] text-gray-500 dark:text-brand-muted mb-1">平倉次數</span>
+                            <span class="text-sm font-bold text-gray-900 dark:text-brand-text font-mono">${currentMetricTab === 'bh' || currentMetricTab === 'dca' ? '-' : m.trades}</span>
                         </div>
                     </div>
                 </div>
