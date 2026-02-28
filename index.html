@@ -3,7 +3,7 @@
 <head>
     <meta charSet="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <title>投資回測系統 v0.8.13 - 台股投資策略回測</title>
+    <title>投資回測系統 v0.8.14 - 台股投資策略回測</title>
     <meta name="description" content="你的投資策略 AI 幫手 — 一次比較 Buy & Hold、定期定額、技術策略三種投資方法"/>
     
     <!-- Tailwind CSS -->
@@ -34,9 +34,9 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #363c4e; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb { background: #363c4e; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #4b5563; }
         body { transition: background-color 0.3s, color 0.3s; overscroll-behavior-y: none; }
         
@@ -267,14 +267,14 @@
     </div>
 
     <!-- Header -->
-    <header class="sticky top-0 z-50 bg-white/90 dark:bg-brand-panel/90 border-b border-gray-200 dark:border-brand-border px-6 py-3 backdrop-blur-md transition-colors">
-        <div class="max-w-[1600px] mx-auto flex items-center justify-between">
+    <header class="sticky top-0 z-50 bg-white/90 dark:bg-brand-panel/90 border-b border-gray-200 dark:border-brand-border py-3 backdrop-blur-md transition-colors">
+        <div class="max-w-[1600px] w-full mx-auto px-4 md:px-6 flex items-center justify-between">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-primary to-brand-secondary flex items-center justify-center text-white font-bold text-xl shadow-lg">H</div>
                 <div>
                     <div class="flex items-center gap-2">
                         <h1 class="text-xl font-bold m-0 text-gray-900 dark:text-white">投資回測系統</h1>
-                        <span class="text-[10px] font-semibold text-brand-primary bg-brand-primary/15 px-2 py-0.5 rounded-full border border-brand-primary/30">v0.8.13</span>
+                        <span class="text-[10px] font-semibold text-brand-primary bg-brand-primary/15 px-2 py-0.5 rounded-full border border-brand-primary/30">v0.8.14</span>
                     </div>
                     <p class="text-xs text-gray-500 dark:text-brand-muted m-0">你的投資策略 AI 幫手</p>
                 </div>
@@ -295,7 +295,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-[320px_1fr_360px] gap-6">
             
             <!-- Left Column: Controls -->
-            <div class="flex flex-col gap-4 lg:sticky lg:top-[88px] h-fit max-h-[calc(100vh-100px)] overflow-y-auto custom-scrollbar pr-2 pb-10">
+            <div class="flex flex-col gap-4 lg:sticky lg:top-[88px] h-fit max-h-[calc(100vh-100px)] overflow-y-auto custom-scrollbar pb-10">
                 
                 <!-- 個人書籤 -->
                 <div class="bg-white dark:bg-brand-panel rounded-xl border border-gray-200 dark:border-brand-border p-4 shadow-sm">
@@ -683,7 +683,7 @@
 
     <!-- Footer -->
     <footer class="border-t border-gray-200 dark:border-brand-border py-6 text-center mt-auto">
-        <p class="text-xs text-gray-500 dark:text-brand-muted m-0">v0.8.13 | ©2026 <a href="https://huobest.com/" target="_blank" class="text-brand-primary hover:text-brand-secondary transition-colors font-medium">霍家私塾</a></p>
+        <p class="text-xs text-gray-500 dark:text-brand-muted m-0">v0.8.14 | ©2026 <a href="https://huobest.com/" target="_blank" class="text-brand-primary hover:text-brand-secondary transition-colors font-medium">霍家私塾</a></p>
     </footer>
 
     <!-- JS Logic -->
